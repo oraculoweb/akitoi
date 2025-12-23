@@ -151,4 +151,5 @@ Thumbs.db
 # Project specific
 *.log
 .data/
+.akitoi_data/
 tmp/
