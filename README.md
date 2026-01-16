@@ -36,10 +36,26 @@ Tu hub de contacto profesional en un solo lugar.
 
 El proyecto está construido con las mejores prácticas de la industria:
 
-- Gestión moderna de dependencias con `pyproject.toml`
-- Herramientas de calidad de código (Ruff, Black, MyPy)
-- Framework de testing con pytest
-- Estructura modular y mantenible
+**Backend:**
+- **API**: FastAPI + Python 3.9+
+- **Base de datos**: Supabase (PostgreSQL)
+- **ORM**: SQLAlchemy + Alembic migrations
+- **Gestión de dependencias**: `pyproject.toml`
+- **Calidad de código**: Ruff, Black, MyPy
+- **Testing**: pytest
+
+**Frontend:**
+- **Framework**: Next.js 14 con App Router
+- **UI**: React 18 + TypeScript 5.3
+- **Estilos**: Tailwind CSS 3.4
+- **Iconos**: Lucide React
+- **Deploy**: Vercel
+
+**Arquitectura:**
+- **API REST**: FastAPI con documentación OpenAPI
+- **SSR**: Server-Side Rendering con Next.js
+- **Analytics**: Tracking automático de eventos
+- **CORS**: Configurado para desarrollo y producción
 
 ## Requisitos
 
@@ -173,28 +189,47 @@ ruff check --fix src/ tests/
 
 ## Roadmap
 
-### Fase 1: Core Features
-- [ ] Sistema de creación de perfiles de usuario
-- [ ] Generador de QR codes y links cortos
-- [ ] Editor de personalización (logo, imagen, colores)
-- [ ] Gestión de enlaces de contacto (WhatsApp, email, social media)
+### ✅ Fase 1: Profile Management MVP (Completado)
+- [x] Sistema de creación de perfiles de usuario
+- [x] API REST con FastAPI
+- [x] Gestión de enlaces de contacto (WhatsApp, email, social media)
+- [x] Editor de personalización (logo, imagen, colores)
+- [x] Storage JSON para desarrollo rápido
 
-### Fase 2: Analytics & Dashboard
-- [ ] Dashboard de estadísticas de visitas
-- [ ] Tracking de clics en enlaces
-- [ ] Reportes de engagement
-- [ ] Métricas de fuentes de tráfico
+### ✅ Fase 2: Modelo DB para Perfiles - Supabase (Completado)
+- [x] Integración con Supabase PostgreSQL
+- [x] Modelos SQLAlchemy optimizados
+- [x] Migraciones con Alembic
+- [x] Índices y constraints para rendimiento
+- [x] Scripts de inicialización y verificación
+- [x] Funciones de utilidad para queries comunes
 
-### Fase 3: Features Avanzados
+### ✅ Fase 3: Frontend Next.js + Vercel (Completado)
+- [x] Aplicación Next.js 14 con TypeScript y Tailwind CSS
+- [x] Página de perfil dinámico [slug] con SSR
+- [x] Cliente API para consumir FastAPI
+- [x] Tracking automático de vistas y clicks
+- [x] Componentes reutilizables (ProfileView, LinkButton)
+- [x] Configuración de CORS en backend
+- [x] Variables de entorno configuradas
+- [x] Deploy automático en Vercel configurado
+- [x] Documentación completa del frontend
+
+### 📋 Fase 4: Features Avanzados
+- [ ] Generador de QR codes
+- [ ] Sistema de links cortos personalizados
 - [ ] Integración con LLM user profiles
 - [ ] Soporte para AI Agents personalizados
 - [ ] Temas prediseñados y templates
-- [ ] API pública para integración
+- [ ] Supabase Storage para imágenes
+- [ ] Supabase Auth para autenticación
 
-### Fase 4: Infrastructure
+### 📋 Fase 5: Infrastructure
 - [ ] Configurar CI/CD
-- [ ] Sistema de caché y optimización
+- [ ] Sistema de caché con Redis
+- [ ] Rate limiting y seguridad
 - [ ] CDN para assets estáticos
+- [ ] Tests de integración completos
 - [ ] Documentación completa de API
 
 ## Licencia
