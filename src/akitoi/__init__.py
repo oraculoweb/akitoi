@@ -12,6 +12,7 @@ from .models.organization import Organization
 from .models.member import Member
 from .models.membership import Membership, MembershipStatus
 from .core.profile_manager import ProfileManager
+from .core.organization_manager import OrganizationManager
 from .core.url_shortener import URLShortener
 
 __version__ = "0.1.0"
@@ -35,6 +36,7 @@ __all__ = [
     "MembershipStatus",
     # Core
     "ProfileManager",
+    "OrganizationManager",
     "URLShortener",
     # Convenience functions
     "create_profile",

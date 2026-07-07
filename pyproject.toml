@@ -36,6 +36,8 @@ dependencies = [
     "python-dotenv>=1.0.0",
     "segno>=1.6.0",
     "itsdangerous>=2.1.0",
+    "openpyxl>=3.1.0",
+    "python-multipart>=0.0.9",
 ]
 
 [project.optional-dependencies]

@@ -26,6 +26,11 @@ class Member:
         email: Contact email (optional; Profile wins when linked)
         phone: Contact phone (optional; Profile wins when linked)
         role: Role inside the club (e.g. "socio", "directivo", "staff")
+        is_active: False when the member was given "baja" (soft delete).
+            The record is never physically removed: it persists for
+            audit purposes (Ley 29733) but leaves active views and its
+            card becomes invalid.
+        deactivated_at: When the soft delete happened
         created_at: Creation timestamp
         updated_at: Last update timestamp
     """
@@ -36,6 +41,8 @@ class Member:
     email: Optional[str] = None
     phone: Optional[str] = None
     role: str = "socio"
+    is_active: bool = True
+    deactivated_at: Optional[datetime] = None
     id: str = field(default_factory=lambda: str(uuid.uuid4()))
     created_at: datetime = field(default_factory=datetime.now)
     updated_at: datetime = field(default_factory=datetime.now)
@@ -48,6 +55,18 @@ class Member:
             raise ValueError("Name is required when member has no linked profile")
         if not self.role:
             raise ValueError("Role is required")
+
+    def deactivate(self) -> None:
+        """Soft delete (baja lógica): keep the record, kill the activity."""
+        self.is_active = False
+        self.deactivated_at = datetime.now()
+        self.updated_at = datetime.now()
+
+    def restore(self) -> None:
+        """Undo a soft delete (re-alta)."""
+        self.is_active = True
+        self.deactivated_at = None
+        self.updated_at = datetime.now()
 
     def link_profile(self, profile_id: str) -> None:
         """
@@ -69,6 +88,9 @@ class Member:
             "email": self.email,
             "phone": self.phone,
             "role": self.role,
+            "is_active": self.is_active,
+            "deactivated_at": self.deactivated_at.isoformat()
+                if self.deactivated_at else None,
             "created_at": self.created_at.isoformat(),
             "updated_at": self.updated_at.isoformat(),
         }
@@ -84,6 +106,9 @@ class Member:
             email=data.get("email"),
             phone=data.get("phone"),
             role=data.get("role", "socio"),
+            is_active=data.get("is_active", True),
+            deactivated_at=datetime.fromisoformat(data["deactivated_at"])
+                if data.get("deactivated_at") else None,
             created_at=datetime.fromisoformat(data["created_at"])
                 if "created_at" in data else datetime.now(),
             updated_at=datetime.fromisoformat(data["updated_at"])

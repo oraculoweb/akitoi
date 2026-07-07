@@ -30,7 +30,13 @@ class JSONOrgStorage(OrgStorageBackend):
         self._org_dir = self.storage_path / "organizations"
         self._member_dir = self.storage_path / "members"
         self._membership_dir = self.storage_path / "memberships"
-        for directory in (self._org_dir, self._member_dir, self._membership_dir):
+        self._import_dir = self.storage_path / "imports"
+        for directory in (
+            self._org_dir,
+            self._member_dir,
+            self._membership_dir,
+            self._import_dir,
+        ):
             directory.mkdir(parents=True, exist_ok=True)
         self._lock = RLock()
 
@@ -171,3 +177,18 @@ class JSONOrgStorage(OrgStorageBackend):
                 for d in self._load_all(self._membership_dir)
                 if d.get("organization_id") == organization_id
             ]
+
+    # --- Import logs ---
+
+    def save_import_log(self, log: dict) -> None:
+        with self._lock:
+            self._write(self._import_dir / f"{log['id']}.json", log)
+
+    def list_import_logs(self, organization_id: str) -> List[dict]:
+        with self._lock:
+            logs = [
+                d
+                for d in self._load_all(self._import_dir)
+                if d.get("organization_id") == organization_id
+            ]
+            return sorted(logs, key=lambda d: d.get("imported_at", ""), reverse=True)

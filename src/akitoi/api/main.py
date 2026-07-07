@@ -53,12 +53,24 @@ app.include_router(
     tags=["Mobile"],
 )
 
-# Clubs: public membership verification (dynamic signed QR target).
-# JSON org storage for now; database backend lands with its migration.
+# Clubs: admin (roster import/export, members, cards) and public
+# membership verification share ONE org storage so a roster upload is
+# instantly visible to the door scanner. JSON storage for now; the
+# database backend lands with its Alembic migration.
 from .routes.verify import create_verify_router  # noqa: E402
+from .routes.organizations import create_org_router  # noqa: E402
+from ..core.organization_manager import OrganizationManager  # noqa: E402
 from ..storage.org_json_storage import JSONOrgStorage  # noqa: E402
 
-app.include_router(create_verify_router(JSONOrgStorage()), tags=["Verification"])
+_org_storage = JSONOrgStorage()
+_public_base_url = os.getenv("PUBLIC_BASE_URL", "https://akitoi.bio")
+
+app.include_router(create_verify_router(_org_storage), tags=["Verification"])
+app.include_router(
+    create_org_router(OrganizationManager(_org_storage), base_url=_public_base_url),
+    prefix="/api/v1/orgs",
+    tags=["Organizations"],
+)
 
 
 @app.get("/")

@@ -98,3 +98,15 @@ class OrgStorageBackend(ABC):
     def list_memberships(self, organization_id: str) -> List[Membership]:
         """List all memberships of an organization."""
         pass
+
+    # --- Import logs (roster audit trail) ---
+
+    @abstractmethod
+    def save_import_log(self, log: dict) -> None:
+        """Persist one roster import record (see core/roster.ImportLog)."""
+        pass
+
+    @abstractmethod
+    def list_import_logs(self, organization_id: str) -> List[dict]:
+        """List roster import records of an organization, newest first."""
+        pass
