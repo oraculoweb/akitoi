@@ -9,6 +9,7 @@ from datetime import datetime
 from typing import Optional, List, Tuple
 
 from ..models.organization import Organization
+from ..models.organization_admin import OrganizationAdmin
 from ..models.member import Member
 from ..models.membership import Membership, MembershipStatus
 from ..models.theme import Theme
@@ -89,6 +90,47 @@ class OrganizationManager:
     def delete_organization(self, organization_id: str) -> bool:
         """Delete an organization."""
         return self.storage.delete_organization(organization_id)
+
+    # --- Admins (authorization: Supabase user_id <-> organization) ---
+
+    def add_admin(
+        self, organization_id: str, user_id: str, role: str = "admin"
+    ) -> OrganizationAdmin:
+        """
+        Link a Supabase user as admin of an organization (idempotent).
+
+        A club can have several admins and a user can administer
+        several clubs.
+        """
+        for link in self.storage.list_org_admins(organization_id):
+            if link.user_id == user_id:
+                return link
+        admin = OrganizationAdmin(
+            organization_id=organization_id, user_id=user_id, role=role
+        )
+        self.storage.save_org_admin(admin)
+        return admin
+
+    def remove_admin(self, organization_id: str, user_id: str) -> bool:
+        """Unlink an admin from an organization."""
+        return self.storage.delete_org_admin(organization_id, user_id)
+
+    def is_admin(self, user_id: str, organization_id: str) -> bool:
+        """Check whether a user administers an organization."""
+        return self.storage.is_org_admin(user_id, organization_id)
+
+    def list_admins(self, organization_id: str) -> List[OrganizationAdmin]:
+        """List the admins of an organization."""
+        return self.storage.list_org_admins(organization_id)
+
+    def list_organizations_for_admin(self, user_id: str) -> List[Organization]:
+        """List the organizations a user administers."""
+        organizations = []
+        for link in self.storage.list_admin_links(user_id):
+            organization = self.storage.get_organization(link.organization_id)
+            if organization:
+                organizations.append(organization)
+        return organizations
 
     # --- Members (alta / baja) ---
 

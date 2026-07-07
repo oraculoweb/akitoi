@@ -12,6 +12,7 @@ from threading import RLock
 
 from .org_base import OrgStorageBackend
 from ..models.organization import Organization
+from ..models.organization_admin import OrganizationAdmin
 from ..models.member import Member
 from ..models.membership import Membership
 
@@ -31,11 +32,13 @@ class JSONOrgStorage(OrgStorageBackend):
         self._member_dir = self.storage_path / "members"
         self._membership_dir = self.storage_path / "memberships"
         self._import_dir = self.storage_path / "imports"
+        self._admin_dir = self.storage_path / "admins"
         for directory in (
             self._org_dir,
             self._member_dir,
             self._membership_dir,
             self._import_dir,
+            self._admin_dir,
         ):
             directory.mkdir(parents=True, exist_ok=True)
         self._lock = RLock()
@@ -177,6 +180,47 @@ class JSONOrgStorage(OrgStorageBackend):
                 for d in self._load_all(self._membership_dir)
                 if d.get("organization_id") == organization_id
             ]
+
+    # --- Organization admins ---
+
+    def save_org_admin(self, admin: OrganizationAdmin) -> None:
+        with self._lock:
+            self._write(self._admin_dir / f"{admin.id}.json", admin.to_dict())
+
+    def delete_org_admin(self, organization_id: str, user_id: str) -> bool:
+        with self._lock:
+            for data in self._load_all(self._admin_dir):
+                if (
+                    data.get("organization_id") == organization_id
+                    and data.get("user_id") == user_id
+                ):
+                    (self._admin_dir / f"{data['id']}.json").unlink()
+                    return True
+            return False
+
+    def list_org_admins(self, organization_id: str) -> List[OrganizationAdmin]:
+        with self._lock:
+            return [
+                OrganizationAdmin.from_dict(d)
+                for d in self._load_all(self._admin_dir)
+                if d.get("organization_id") == organization_id
+            ]
+
+    def list_admin_links(self, user_id: str) -> List[OrganizationAdmin]:
+        with self._lock:
+            return [
+                OrganizationAdmin.from_dict(d)
+                for d in self._load_all(self._admin_dir)
+                if d.get("user_id") == user_id
+            ]
+
+    def is_org_admin(self, user_id: str, organization_id: str) -> bool:
+        with self._lock:
+            return any(
+                d.get("user_id") == user_id
+                and d.get("organization_id") == organization_id
+                for d in self._load_all(self._admin_dir)
+            )
 
     # --- Import logs ---
 

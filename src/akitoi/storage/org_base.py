@@ -11,6 +11,7 @@ from abc import ABC, abstractmethod
 from typing import Optional, List
 
 from ..models.organization import Organization
+from ..models.organization_admin import OrganizationAdmin
 from ..models.member import Member
 from ..models.membership import Membership
 
@@ -97,6 +98,33 @@ class OrgStorageBackend(ABC):
     @abstractmethod
     def list_memberships(self, organization_id: str) -> List[Membership]:
         """List all memberships of an organization."""
+        pass
+
+    # --- Organization admins (authorization links) ---
+
+    @abstractmethod
+    def save_org_admin(self, admin: OrganizationAdmin) -> None:
+        """Persist a user_id <-> organization_id management link."""
+        pass
+
+    @abstractmethod
+    def delete_org_admin(self, organization_id: str, user_id: str) -> bool:
+        """Remove a management link. Returns True if it existed."""
+        pass
+
+    @abstractmethod
+    def list_org_admins(self, organization_id: str) -> List[OrganizationAdmin]:
+        """List the admins of an organization."""
+        pass
+
+    @abstractmethod
+    def list_admin_links(self, user_id: str) -> List[OrganizationAdmin]:
+        """List every organization link of a user."""
+        pass
+
+    @abstractmethod
+    def is_org_admin(self, user_id: str, organization_id: str) -> bool:
+        """Check whether a user administers an organization."""
         pass
 
     # --- Import logs (roster audit trail) ---

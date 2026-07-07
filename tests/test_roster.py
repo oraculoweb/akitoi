@@ -260,12 +260,23 @@ class TestOrgAPI:
     def client(self, manager):
         from fastapi import FastAPI
         from fastapi.testclient import TestClient
+        from akitoi.api.auth import AuthUser
         from akitoi.api.routes.organizations import create_org_router
         from akitoi.api.routes.verify import create_verify_router
 
+        # Bypass Supabase JWT validation: these tests exercise the roster
+        # flow, not auth (see tests/test_auth.py for the auth surface).
+        async def fake_user() -> AuthUser:
+            return AuthUser(user_id="test-admin")
+
         app = FastAPI()
         app.include_router(
-            create_org_router(manager, "https://akitoi.bio", secret_key=TEST_KEY),
+            create_org_router(
+                manager,
+                "https://akitoi.bio",
+                secret_key=TEST_KEY,
+                user_dependency=fake_user,
+            ),
             prefix="/api/v1/orgs",
         )
         app.include_router(create_verify_router(manager.storage, secret_key=TEST_KEY))
