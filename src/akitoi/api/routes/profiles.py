@@ -13,8 +13,19 @@ from ...storage.database_storage import DatabaseStorage
 
 router = APIRouter()
 
-# Initialize profile manager with Supabase database storage
-profile_manager = ProfileManager(storage=DatabaseStorage())
+
+def _build_storage():
+    """Use Supabase when DATABASE_URL is set; JSON storage for local dev."""
+    import os
+
+    if os.getenv("DATABASE_URL"):
+        return DatabaseStorage()
+    from ...storage.json_storage import JSONStorage
+
+    return JSONStorage()
+
+
+profile_manager = ProfileManager(storage=_build_storage())
 
 
 # Pydantic schemas for API
