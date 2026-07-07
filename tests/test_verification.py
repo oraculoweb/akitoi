@@ -181,6 +181,14 @@ class TestVerifyEndpoint:
         response = client.get(f"/verify/{token}?format=json")
         assert response.status_code == 404
 
+    def test_public_card_qr(self, client, membership):
+        """The card view fetches the QR without auth; bad tokens get 401."""
+        response = client.get(f"/verify/{self._token(membership)}/qr.svg")
+        assert response.status_code == 200
+        assert "<svg" in response.text
+
+        assert client.get("/verify/basura/qr.svg").status_code == 401
+
     def test_html_page_for_human_scanners(self, client, membership):
         """Scanning with a phone camera shows a readable page."""
         response = client.get(f"/verify/{self._token(membership)}")

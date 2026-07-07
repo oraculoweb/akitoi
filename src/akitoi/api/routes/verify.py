@@ -16,9 +16,10 @@ from string import Template
 from typing import Optional
 
 from fastapi import APIRouter, HTTPException, Request, status
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.responses import HTMLResponse, JSONResponse, Response
 
 from ...core.membership_tokens import InvalidTokenError, verify_membership_token
+from ...mobile.qr import qr_svg
 from ...models.membership import Membership, MembershipStatus
 from ...storage.org_base import OrgStorageBackend
 
@@ -82,6 +83,30 @@ def create_verify_router(
         token_max_age: Optional global cap on token signature age (seconds)
     """
     router = APIRouter()
+
+    @router.get("/verify/{token}/qr.svg")
+    async def verify_qr(token: str, request: Request):
+        """
+        Public QR of the verification URL (for the digital card view).
+
+        Exposes nothing the token holder doesn't already have: it only
+        re-encodes /verify/{token} as a scannable image, tinted with
+        the club's theme color.
+        """
+        try:
+            payload = verify_membership_token(
+                token, max_age=token_max_age, secret_key=secret_key
+            )
+        except InvalidTokenError as exc:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail=f"Token inválido: {exc}",
+            )
+
+        organization = storage.get_organization(payload.get("org", ""))
+        dark = organization.theme.primary_color if organization else "#000000"
+        verify_url = str(request.base_url).rstrip("/") + f"/verify/{token}"
+        return Response(qr_svg(verify_url, dark=dark), media_type="image/svg+xml")
 
     @router.get("/verify/{token}")
     async def verify_membership(token: str, request: Request, format: str = "html"):
