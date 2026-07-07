@@ -53,6 +53,13 @@ app.include_router(
     tags=["Mobile"],
 )
 
+# Clubs: public membership verification (dynamic signed QR target).
+# JSON org storage for now; database backend lands with its migration.
+from .routes.verify import create_verify_router  # noqa: E402
+from ..storage.org_json_storage import JSONOrgStorage  # noqa: E402
+
+app.include_router(create_verify_router(JSONOrgStorage()), tags=["Verification"])
+
 
 @app.get("/")
 async def root():

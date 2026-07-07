@@ -35,6 +35,7 @@ dependencies = [
     "pydantic-settings>=2.1.0",
     "python-dotenv>=1.0.0",
     "segno>=1.6.0",
+    "itsdangerous>=2.1.0",
 ]
 
 [project.optional-dependencies]

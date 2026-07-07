@@ -91,6 +91,19 @@ source venv/bin/activate
 pip install -e .
 ```
 
+### Configuración (variables de entorno)
+
+Copia `.env.example` a `.env` y ajusta los valores. Las claves principales:
+
+| Variable | Uso | Requerida |
+|----------|-----|-----------|
+| `SECRET_KEY` | Firma los tokens de verificación de membresías (QR dinámico de clubes). Genera una con `python -c "import secrets; print(secrets.token_urlsafe(32))"` | **Sí en producción** (la app no arranca sin ella); en desarrollo usa un fallback inseguro con warning |
+| `DATABASE_URL` | Conexión a Supabase/PostgreSQL; sin ella la API usa storage JSON local | No (solo producción) |
+| `ENVIRONMENT` | `development` / `production` | No (default: development) |
+| `PUBLIC_BASE_URL` | URL pública para links y QR | No |
+
+Nunca commitees valores reales: `.env` está en `.gitignore`.
+
 ### Instalación para desarrollo
 
 ```bash
