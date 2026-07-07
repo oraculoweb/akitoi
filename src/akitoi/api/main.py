@@ -41,6 +41,18 @@ app.include_router(health.router, tags=["Health"])
 app.include_router(profiles.router, prefix="/api/v1/profiles", tags=["Profiles"])
 app.include_router(analytics.router, prefix="/api/v1/analytics", tags=["Analytics"])
 
+# Mobile layer (public hub page, vCard, QR, NFC, contact assistant)
+# shares the same ProfileManager/storage as the profiles routes.
+from .routes.mobile import create_mobile_router  # noqa: E402
+
+app.include_router(
+    create_mobile_router(
+        profiles.profile_manager,
+        base_url=os.getenv("PUBLIC_BASE_URL", "https://akitoi.bio"),
+    ),
+    tags=["Mobile"],
+)
+
 
 @app.get("/")
 async def root():

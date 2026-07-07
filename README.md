@@ -32,6 +32,13 @@ Tu hub de contacto profesional en un solo lugar.
   - Clics en enlaces
   - Métricas de engagement
 
+- **Capa móvil (MVP)**: El hub se guarda en la agenda del teléfono
+  - vCard (.vcf) con solo datos básicos y públicos → agenda nativa iOS/Android
+  - QR real (URL del hub o vCard completa offline) + PNG para fondo de pantalla
+  - Payload NFC/NDEF para compartir con un tap (tags NTAG / HCE)
+  - Asistente de contacto intermediario (el visitante nunca ve tus canales privados)
+  - Ver [docs/MVP_MOVIL.md](docs/MVP_MOVIL.md)
+
 ### Stack técnico
 
 El proyecto está construido con las mejores prácticas de la industria:

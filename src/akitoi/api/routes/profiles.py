@@ -233,9 +233,9 @@ async def add_link(profile_id: str, link_data: LinkCreate):
     Add a link to a profile.
     """
     link = Link(
-        type=link_data.type,
+        title=link_data.label or link_data.type.value.title(),
         url=link_data.url,
-        label=link_data.label,
+        link_type=link_data.type,
         icon=link_data.icon,
     )
 

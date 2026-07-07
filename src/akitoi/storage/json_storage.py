@@ -5,7 +5,7 @@ import json
 import os
 from pathlib import Path
 from typing import Optional, List, Dict
-from threading import Lock
+from threading import RLock
 
 from .base import StorageBackend
 from ..models.profile import Profile
@@ -28,7 +28,9 @@ class JSONStorage(StorageBackend):
         """
         self.storage_path = Path(storage_path)
         self.storage_path.mkdir(exist_ok=True)
-        self._lock = Lock()
+        # RLock: get_profile_by_slug/delete_profile re-enter get_profile
+        # while holding the lock; a plain Lock would deadlock.
+        self._lock = RLock()
 
     def _get_profile_path(self, profile_id: str) -> Path:
         """Get file path for a profile."""

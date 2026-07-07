@@ -148,6 +148,10 @@ cython_debug/
 .DS_Store
 Thumbs.db
 
+# Node / frontend tooling
+node_modules/
+package-lock.json
+
 # Project specific
 *.log
 .data/
