@@ -59,11 +59,10 @@ class DatabaseStorage(StorageBackend):
                 title=link_db.label or "",
                 url=link_db.url,
                 link_type=link_type_enum,
-                icon=link_db.icon
+                icon=link_db.icon,
+                clicks=link_db.click_count,
+                id=link_db.id,
             )
-            # Preserve database ID and stats
-            link._id = link_db.id
-            link._click_count = link_db.click_count
             links.append(link)
 
         # Create Profile object with all attributes from database
@@ -146,14 +145,14 @@ class DatabaseStorage(StorageBackend):
                 # Add new links
                 for order, link in enumerate(profile.links, start=1):
                     link_db = LinkDB(
-                        id=getattr(link, '_id', None) or link.id,
+                        id=link.id,
                         profile_id=profile.id,
                         type=link.link_type.value if hasattr(link.link_type, 'value') else str(link.link_type),
                         url=link.url,
                         label=link.title,
                         icon=link.icon,
                         order=order,
-                        click_count=getattr(link, '_click_count', 0),
+                        click_count=link.clicks,
                         created_at=datetime.utcnow()
                     )
                     db.add(link_db)
@@ -172,7 +171,7 @@ class DatabaseStorage(StorageBackend):
                         label=link.title,
                         icon=link.icon,
                         order=order,
-                        click_count=0,
+                        click_count=link.clicks,
                         created_at=datetime.utcnow()
                     )
                     db.add(link_db)

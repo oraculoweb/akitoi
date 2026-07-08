@@ -1,6 +1,7 @@
 """
 Link model for profile contact links.
 """
+import uuid
 from dataclasses import dataclass, field
 from typing import Optional
 from datetime import datetime
@@ -30,6 +31,7 @@ class Link:
     Contact link in a profile.
 
     Attributes:
+        id: Unique link identifier
         title: Display title for the link
         url: URL or contact information
         link_type: Type of link (whatsapp, email, social, etc.)
@@ -47,6 +49,7 @@ class Link:
     is_active: bool = True
     position: int = 0
     clicks: int = 0
+    id: str = field(default_factory=lambda: str(uuid.uuid4()))
     created_at: datetime = field(default_factory=datetime.now)
 
     def __post_init__(self):
@@ -80,6 +83,7 @@ class Link:
     def to_dict(self) -> dict:
         """Convert link to dictionary."""
         return {
+            "id": self.id,
             "title": self.title,
             "url": self.url,
             "link_type": self.link_type.value,
@@ -93,7 +97,7 @@ class Link:
     @classmethod
     def from_dict(cls, data: dict) -> "Link":
         """Create link from dictionary."""
-        return cls(
+        link = cls(
             title=data["title"],
             url=data["url"],
             link_type=LinkType(data.get("link_type", "custom")),
@@ -104,3 +108,6 @@ class Link:
             created_at=datetime.fromisoformat(data["created_at"])
                 if "created_at" in data else datetime.now(),
         )
+        if "id" in data:
+            link.id = data["id"]
+        return link
